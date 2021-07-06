@@ -13,7 +13,7 @@ import{colors} from './src/util/colors'
 
 
 export default function App() {
-  const [isPostPage, setIsPostPage] = useState(true);
+  const [isPostPage, setIsPostPage] = useState(false);
   const [email, setEmail] = useState(false);
    var firebaseConfig = {
     apiKey: "AIzaSyByj3647tb72aC3Jxfkhy-rTylOS1lpO8w",
