@@ -3,9 +3,7 @@ import {
   StyleSheet,
   Button,
   View,
-  SafeAreaView,
   Text,
-  Alert,
   TouchableOpacity,
 } from 'react-native';
 import firebase from 'firebase';
@@ -13,37 +11,33 @@ import { TextInput } from 'react-native-paper';
 import { colors } from '../util/colors';
 import { spacing, fontSizes } from '../util/sizes';
 
-export const Login = ({ setIsPostPage }) => {
+export const Login = ({ setIsPostPage, saveEmail }) => {
   const [email, setEmail] = useState(null);
   const [pass, setPass] = useState(null);
   const [isSignup, setIsSignup] = useState(false);
-
-  async function onLogin() {
+ 
+  async function onLogin(isSignup) {
     let firebaseuser = null;
 
     try {
-      firebaseuser = await firebase
-        .auth()
-        .signInWithEmailAndPassword(email, pass);
-    } catch (error) {
-      alert(error.message);
-    }
 
-    setIsPostPage(firebaseuser);
-  }
-  async function onSignup() {
-    let firebaseuser = null;
-
-    try {
-      firebaseuser = await firebase
+      if(isSignup) {      
+        firebaseuser = await firebase
         .auth()
         .createUserWithEmailAndPassword(email, pass);
+
+      } else {firebaseuser = await firebase 
+        .auth()
+        .signInWithEmailAndPassword(email, pass);}
+      
+       
     } catch (error) {
       alert(error.message);
     }
-
+    saveEmail(email)
     setIsPostPage(firebaseuser);
   }
+  
 
   return (
     <View style={styles.container}>
@@ -72,7 +66,7 @@ export const Login = ({ setIsPostPage }) => {
           <Button
             style={styles.buttonDesign}
             title="Sign up"
-            onPress={() => onSignup()}
+            onPress={() => onLogin(true)}
           />
         ) : (
           <Button

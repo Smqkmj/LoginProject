@@ -7,15 +7,14 @@ import {Login} from './src/screens/Login';
 
 import {Home} from './src/screens/Home';
 import firebase from 'firebase';
-// or any pure javascript modules available in npm
-import { Card } from 'react-native-paper';
 import{colors} from './src/util/colors'
 
 
 
 
 export default function App() {
-  const [isPostPage, setIsPostPage] = useState(false);
+  const [isPostPage, setIsPostPage] = useState(true);
+  const [email, setEmail] = useState(false);
    var firebaseConfig = {
     apiKey: "AIzaSyByj3647tb72aC3Jxfkhy-rTylOS1lpO8w",
     authDomain: "loginproject-91cec.firebaseapp.com",
@@ -35,7 +34,7 @@ export default function App() {
   
   return (
     <View style={styles.container}>
-    { isPostPage? <Home /> : <Login setIsPostPage={setIsPostPage} />}
+    { isPostPage? <Home setIsPostPage={setIsPostPage} email={email}/> : <Login setIsPostPage={setIsPostPage} saveEmail={setEmail} />}
       
     
     </View> 

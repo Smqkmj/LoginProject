@@ -1,4 +1,4 @@
-import React, { useState, Component } from 'react';
+import React, { useState, Component, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -11,19 +11,83 @@ import {
 import { TextInput } from 'react-native-paper';
 import { colors } from '../util/colors';
 import { fontSizes, spacing } from '../util/sizes';
-import { Post } from '../Post';
+import firebase from 'firebase';
+import "firebase/auth";
 
-export const Home = ({ setIsPostPage }) => {
+export const Home = ({ setIsPostPage, email}) => {
   const [text, onChangeText] = useState('');
   const [posts, setPosts] = useState([]);
- 
+  const db = firebase.firestore();
+  
+useEffect(() => {
+  try{
+    myPosts(db)
+
+
+  }catch (error){
+    alert(error.message);
+  }
+  
+},[]);
+async function myPosts(db) {
+  // [START firestore_query_filter_dataset]
+  const posts = db.collection('posts').doc('FdebLLkgLbnNx8VElWFL');
+  const doc = await posts.get();
+  if (!doc.exists) {
+    return [];
+  } else {
    
+    setPosts(doc.data().posts)
+  }
+}
+async function onPost(){
+  try{
+    const newPost = db.collection('posts');
+    
+    await newPost.doc('FdebLLkgLbnNx8VElWFL').set({
+    posts: [...posts, {email,post:text}]
+  });
+  setPosts([...posts, {email,post:text}]);
+  onChangeText('');
+}catch (error){
+  alert(error.message);
+}
+  
+}
+  
+async function onLogout() {
+  let firebaseuser = null;
+
+  try {
+    firebaseuser = await firebase
+      .auth()
+      .signOut();
+      setIsPostPage(false);
+  } catch (error) {
+    alert(error.message);
+  }
+
+}
+
+
 
   return (
     <View style={styles.container}>
       <View style={styles.logoContainer}>
         <Text style={styles.logo}>Tilleli</Text>
+        </View>
+        <View style={styles.buttonPlacement}>
+
+        
+        <Button
+          onPress={() => {
+            onLogout();
+          }}
+          style={styles.buttonStyle}
+          title="Logout"
+        />
       </View>
+      
     
       <ScrollView>
         <View style={styles.inputView}>
@@ -39,17 +103,16 @@ export const Home = ({ setIsPostPage }) => {
       <View style={styles.buttonPlacement}>
         <Button
           onPress={() => {
-            setPosts([...posts, text]);
-            onChangeText('');
+            onPost()
           }}
           style={styles.buttonStyle}
           title="Post"
         />
       </View>
-      {posts.map((post, key) => {
+      {posts && posts.map((post, key) => {
         return (
           <Text key={key} style={styles.post}>
-            {post}
+            <Text style={styles.postAuthor}>{post.email}{'\n'}</Text>{post.post} 
           </Text>
         );
       })}
@@ -78,6 +141,7 @@ const styles = StyleSheet.create({
   },
 
   inputView: {
+    marginTop:10,
     height: spacing.xxl,
   },
   inputText: {
@@ -93,19 +157,23 @@ const styles = StyleSheet.create({
   },
   buttonPlacement: {
     marginTop: 10,
-    marginBottom: 10,
     marginLeft: 240,
     justifyContent: 'center',
     flexDirection: 'row',
   },
   post: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.skyBlue,
     padding: spacing.sm,
     fontSize: fontSizes.lg,
     marginTop: 20,
     width: '100%',
-    alignSelf: 'flex-start',
-    //opacity:0.5,
-    //display:none,
+
+  },
+  postAuthor:{
+    fontSize: fontSizes.md, 
+    backgroundColor:colors.green, 
+    textAlignVertical:'top',
+    justifyContent:'center'
+    
   },
 });
